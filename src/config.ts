@@ -1,8 +1,4 @@
-import type {
-	NavBarConfig,
-	ProfileConfig,
-	SiteConfig,
-} from "./types/config";
+import type { NavBarConfig, ProfileConfig, SiteConfig } from "./types/config";
 import { LinkPreset } from "./types/config";
 
 export const siteConfig: SiteConfig = {
@@ -17,9 +13,9 @@ export const siteConfig: SiteConfig = {
 		enable: true,
 		src: [
 			{
-				src: "https://t.alcy.cc/moez"
-			}
-		], 
+				src: "https://t.alcy.cc/moez",
+			},
+		],
 		position: "center",
 		credit: {
 			enable: false,
@@ -35,9 +31,7 @@ export const siteConfig: SiteConfig = {
 };
 
 export const navBarConfig: NavBarConfig = {
-	links: [
-		LinkPreset.Home,
-	],
+	links: [LinkPreset.Home],
 };
 
 export const profileConfig: ProfileConfig = {

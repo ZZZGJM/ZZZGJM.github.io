@@ -1,0 +1,156 @@
+---
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+import { getProductById } from "../constants/products";
+import { Icon } from "astro-icon/components";
+import { url } from "../utils/url-utils";
+
+const { productId, orderId } = Astro.url.searchParams;
+const product = productId ? getProductById(productId) : null;
+
+if (!product || !orderId) {
+	return Astro.redirect(url("/"));
+}
+---
+
+<MainGridLayout title="支付成功" description="订单支付成功">
+	<div class="card-base p-6 md:p-8 max-w-2xl mx-auto">
+		<!-- 成功提示 -->
+		<div class="text-center mb-8">
+			<div class="w-24 h-24 mx-auto mb-6 rounded-full bg-green-500 flex items-center justify-center">
+				<Icon name="material-symbols:check-circle-rounded" class="text-white text-6xl"></Icon>
+			</div>
+			<h1 class="text-3xl font-bold mb-2 text-[var(--primary)]">支付成功！</h1>
+			<p class="text-75">订单号：{orderId}</p>
+		</div>
+
+		<!-- 订单信息 -->
+		<div class="mb-8 p-6 bg-[var(--card-bg)] rounded-lg">
+			<h2 class="text-xl font-semibold mb-4">订单信息</h2>
+			<div class="space-y-3">
+				<div class="flex justify-between">
+					<span class="text-75">商品名称：</span>
+					<span class="font-medium">{product.name}</span>
+				</div>
+				<div class="flex justify-between">
+					<span class="text-75">订单金额：</span>
+					<span class="font-bold text-[var(--primary)]">¥{product.price.toFixed(2)}</span>
+				</div>
+				<div class="flex justify-between">
+					<span class="text-75">支付时间：</span>
+					<span>{new Date().toLocaleString("zh-CN")}</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- 私密信息 -->
+		{#if product.secretContent}
+			<div class="mb-8 p-6 bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 rounded-lg border-2 border-[var(--primary)]/20 relative overflow-hidden">
+				<!-- 装饰性背景 -->
+				<div class="absolute top-0 right-0 w-32 h-32 bg-[var(--primary)]/5 rounded-full -mr-16 -mt-16"></div>
+				<div class="absolute bottom-0 left-0 w-24 h-24 bg-[var(--primary)]/5 rounded-full -ml-12 -mb-12"></div>
+				
+				<div class="relative z-10">
+					<div class="flex items-center gap-2 mb-4">
+						<div class="p-2 bg-[var(--primary)]/20 rounded-lg">
+							<Icon name="material-symbols:lock-rounded" class="text-[var(--primary)] text-2xl"></Icon>
+						</div>
+						<h2 class="text-xl font-semibold text-[var(--primary)]">私密信息</h2>
+						<div class="ml-auto px-3 py-1 bg-green-500/20 text-green-500 text-xs font-semibold rounded-full">
+							已解锁
+						</div>
+					</div>
+					<div class="p-5 bg-[var(--card-bg)] rounded-lg border border-[var(--line-color)] shadow-sm">
+						<pre id="secret-content" class="whitespace-pre-wrap text-sm leading-relaxed text-75 font-mono">{product.secretContent}</pre>
+					</div>
+					
+					<!-- 操作提示 -->
+					<div class="mt-4 flex items-center gap-2 text-xs text-75">
+						<Icon name="material-symbols:content-copy-outline-rounded" class="text-base"></Icon>
+						<button
+							id="copy-button"
+							class="hover:text-[var(--primary)] transition-colors"
+						>
+							点击复制全部内容
+						</button>
+					</div>
+				</div>
+			</div>
+		{/if}
+
+		<!-- 操作按钮 -->
+		<div class="flex gap-4">
+			<a
+				href={url("/")}
+				class="flex-1 py-3 rounded-lg border-2 border-[var(--line-color)] text-center font-semibold hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
+			>
+				返回首页
+			</a>
+			<button
+				onclick="window.print()"
+				class="flex-1 py-3 rounded-lg bg-[var(--primary)] text-white font-semibold hover:opacity-90 transition-opacity"
+			>
+				打印订单
+			</button>
+		</div>
+
+		<!-- 温馨提示 -->
+		<div class="mt-8 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+			<div class="flex items-start gap-2">
+				<Icon name="material-symbols:info-rounded" class="text-yellow-500 text-xl flex-shrink-0 mt-0.5"></Icon>
+				<div class="text-sm text-75">
+					<p class="font-semibold mb-1">温馨提示：</p>
+					<p>请妥善保管您的私密信息，建议截图保存。如有任何问题，请联系客服。</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</MainGridLayout>
+
+<script>
+	const copyButton = document.getElementById("copy-button");
+	const secretContentEl = document.getElementById("secret-content");
+	
+	if (copyButton && secretContentEl) {
+		copyButton.addEventListener("click", () => {
+			const secretContent = secretContentEl.textContent || "";
+			if (secretContent) {
+				if (navigator.clipboard && navigator.clipboard.writeText) {
+					navigator.clipboard.writeText(secretContent).then(() => {
+						copyButton.textContent = "已复制！";
+						setTimeout(() => {
+							copyButton.textContent = "点击复制全部内容";
+						}, 2000);
+					}).catch(() => {
+						// 降级方案
+						copyToClipboardFallback(secretContent);
+					});
+				} else {
+					copyToClipboardFallback(secretContent);
+				}
+			}
+		});
+	}
+	
+	function copyToClipboardFallback(text: string) {
+		const textarea = document.createElement("textarea");
+		textarea.value = text;
+		textarea.style.position = "fixed";
+		textarea.style.opacity = "0";
+		document.body.appendChild(textarea);
+		textarea.select();
+		try {
+			document.execCommand("copy");
+			const copyButton = document.getElementById("copy-button");
+			if (copyButton) {
+				copyButton.textContent = "已复制！";
+				setTimeout(() => {
+					copyButton.textContent = "点击复制全部内容";
+				}, 2000);
+			}
+		} catch (err) {
+			alert("复制失败，请手动选择文本复制");
+		}
+		document.body.removeChild(textarea);
+	}
+</script>
+

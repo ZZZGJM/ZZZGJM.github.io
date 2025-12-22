@@ -1,0 +1,129 @@
+---
+import type { Product } from "../../types/product";
+import { getProductById } from "../../constants/products";
+import MainGridLayout from "../../layouts/MainGridLayout.astro";
+import ImageWrapper from "../../components/misc/ImageWrapper.astro";
+import PaymentModal from "../../components/PaymentModal.svelte";
+import { Icon } from "astro-icon/components";
+import { url } from "../../utils/url-utils";
+
+export async function getStaticPaths() {
+	const { products } = await import("../../constants/products");
+	return products.map((product) => ({
+		params: { id: product.id },
+		props: { product },
+	}));
+}
+
+const { product } = Astro.props;
+
+if (!product) {
+	return Astro.redirect(url("/"));
+}
+---
+
+<MainGridLayout title={product.name} description={product.description}>
+	<div class="card-base p-6 md:p-8">
+		<!-- 返回按钮 -->
+		<a
+			href={url("/")}
+			class="inline-flex items-center gap-2 mb-6 text-[var(--primary)] hover:opacity-80 transition-opacity"
+		>
+			<Icon name="material-symbols:arrow-back-rounded" class="text-xl"></Icon>
+			<span>返回商品列表</span>
+		</a>
+
+		<div class="grid md:grid-cols-2 gap-8">
+			<!-- 商品图片 -->
+			<div class="relative">
+				<div class="aspect-square rounded-xl overflow-hidden bg-[var(--card-bg)]">
+					<ImageWrapper
+						src={product.image}
+						alt={product.name}
+						class="w-full h-full object-cover"
+					/>
+				</div>
+				<div class="mt-4 flex gap-2">
+					<div class="px-4 py-2 rounded-lg bg-[var(--primary)]/10 text-[var(--primary)] font-semibold">
+						{product.category}
+					</div>
+				</div>
+			</div>
+
+			<!-- 商品信息 -->
+			<div>
+				<h1 class="text-3xl md:text-4xl font-bold mb-4 text-[var(--primary)]">
+					{product.name}
+				</h1>
+				<div class="mb-6">
+					<div class="flex items-baseline gap-2 mb-4">
+						<span class="text-2xl text-75">¥</span>
+						<span class="text-5xl font-bold text-[var(--primary)]">
+							{product.price.toFixed(2)}
+						</span>
+					</div>
+					<div class="flex items-center gap-2 text-sm text-75">
+						<Icon name="material-symbols:verified-rounded" class="text-green-500"></Icon>
+						<span>正品保证 · 即时交付 · 安全支付</span>
+					</div>
+				</div>
+
+				<div class="mb-8 p-5 bg-[var(--card-bg)] rounded-lg border border-[var(--line-color)]">
+					<h2 class="text-xl font-semibold mb-3 flex items-center gap-2">
+						<Icon name="material-symbols:description-outline-rounded" class="text-[var(--primary)]"></Icon>
+						商品描述
+					</h2>
+					<p class="text-75 leading-relaxed whitespace-pre-line">
+						{product.description}
+					</p>
+				</div>
+
+				<!-- 购买按钮 -->
+				<button
+					id="buy-button"
+					class="w-full py-4 rounded-lg bg-[var(--primary)] text-white font-semibold text-lg hover:opacity-90 hover:shadow-lg active:scale-95 transition-all mb-4 flex items-center justify-center gap-2"
+				>
+					<Icon name="material-symbols:shopping-cart-rounded" class="text-xl"></Icon>
+					立即购买
+				</button>
+
+				<!-- 服务保障 -->
+				<div class="border-t border-[var(--line-color)] pt-6 mt-6">
+					<h3 class="font-semibold mb-3">服务保障</h3>
+					<div class="grid grid-cols-2 gap-4 text-sm">
+						<div class="flex items-center gap-2">
+							<Icon name="material-symbols:security-rounded" class="text-[var(--primary)]"></Icon>
+							<span>安全支付</span>
+						</div>
+						<div class="flex items-center gap-2">
+							<Icon name="material-symbols:verified-rounded" class="text-[var(--primary)]"></Icon>
+							<span>正品保证</span>
+						</div>
+						<div class="flex items-center gap-2">
+							<Icon name="material-symbols:support-agent-rounded" class="text-[var(--primary)]"></Icon>
+							<span>7×24客服</span>
+						</div>
+						<div class="flex items-center gap-2">
+							<Icon name="material-symbols:local-shipping-rounded" class="text-[var(--primary)]"></Icon>
+							<span>即时交付</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</MainGridLayout>
+
+<PaymentModal client:load product={product} />
+
+<script>
+	const buyButton = document.getElementById("buy-button");
+
+	if (buyButton) {
+		buyButton.addEventListener("click", () => {
+			// 触发支付弹窗
+			document.dispatchEvent(new CustomEvent("openPaymentModal"));
+		});
+	}
+</script>
+

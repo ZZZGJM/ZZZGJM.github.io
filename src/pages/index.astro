@@ -1,0 +1,154 @@
+---
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+import ProductCard from "../components/ProductCard.astro";
+import { products, getAllCategories } from "../constants/products";
+---
+
+<MainGridLayout title="商城首页" description="精选优质商品，欢迎选购">
+	<div class="space-y-8">
+		<!-- 页面标题 -->
+		<div class="text-center mb-8">
+			<h1 class="text-4xl md:text-5xl font-bold mb-3 text-[var(--primary)]">精选商城</h1>
+			<p class="text-lg text-75 mb-6">发现优质商品，享受便捷购物体验</p>
+			
+			<!-- 特色标签 -->
+			<div class="flex flex-wrap justify-center gap-3 mt-6">
+				<div class="flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--primary)]/10 border border-[var(--primary)]/20">
+					<Icon name="material-symbols:verified-rounded" class="text-[var(--primary)]"></Icon>
+					<span class="text-sm font-medium text-[var(--primary)]">正品保证</span>
+				</div>
+				<div class="flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--primary)]/10 border border-[var(--primary)]/20">
+					<Icon name="material-symbols:local-shipping-rounded" class="text-[var(--primary)]"></Icon>
+					<span class="text-sm font-medium text-[var(--primary)]">即时交付</span>
+				</div>
+				<div class="flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--primary)]/10 border border-[var(--primary)]/20">
+					<Icon name="material-symbols:security-rounded" class="text-[var(--primary)]"></Icon>
+					<span class="text-sm font-medium text-[var(--primary)]">安全支付</span>
+				</div>
+				<div class="flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--primary)]/10 border border-[var(--primary)]/20">
+					<Icon name="material-symbols:support-agent-rounded" class="text-[var(--primary)]"></Icon>
+					<span class="text-sm font-medium text-[var(--primary)]">7×24客服</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- 商品分类 -->
+		<div class="card-base p-4 mb-6">
+			<div class="flex items-center gap-2 mb-4">
+				<Icon name="material-symbols:category-outline-rounded" class="text-[var(--primary)] text-xl"></Icon>
+				<h2 class="text-lg font-semibold">商品分类</h2>
+			</div>
+			<div class="flex flex-wrap gap-3">
+				<button
+					class="category-filter px-5 py-2.5 rounded-lg bg-[var(--primary)] text-white font-semibold transition-all active:scale-95 shadow-md hover:shadow-lg"
+					data-category="all"
+				>
+					全部商品
+				</button>
+				{getAllCategories().map((category) => (
+					<button
+						class="category-filter px-5 py-2.5 rounded-lg bg-[var(--card-bg)] border-2 border-[var(--line-color)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all active:scale-95 hover:shadow-md"
+						data-category={category}
+					>
+						{category}
+					</button>
+				))}
+			</div>
+		</div>
+
+		<!-- 商品统计 -->
+		<div class="flex items-center justify-between text-sm text-75 mb-4">
+			<span id="product-count">共 {products.length} 件商品</span>
+			<div class="flex items-center gap-2">
+				<Icon name="material-symbols:grid-view-rounded" class="text-lg"></Icon>
+				<span>网格视图</span>
+			</div>
+		</div>
+
+		<!-- 商品网格 -->
+		<div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			{products.map((product, index) => (
+				<ProductCard
+					product={product}
+					class="onload-animation"
+					style={`animation-delay: calc(var(--content-delay) + ${index * 50}ms);`}
+					data-category={product.category}
+				/>
+			))}
+		</div>
+
+		<!-- 空状态 -->
+		<div id="empty-state" class="hidden text-center py-16">
+			<div class="card-base p-8 max-w-md mx-auto">
+				<Icon name="material-symbols:inventory-2-outline-rounded" class="text-6xl text-75 mb-4"></Icon>
+				<p class="text-xl font-semibold text-75 mb-2">该分类下暂无商品</p>
+				<p class="text-sm text-75">试试其他分类吧</p>
+			</div>
+		</div>
+	</div>
+</MainGridLayout>
+
+<script>
+	import { Icon } from "astro-icon/components";
+
+	// 商品分类筛选功能
+	const categoryFilters = document.querySelectorAll(".category-filter");
+	const products = document.querySelectorAll("[data-category]");
+	const productsGrid = document.getElementById("products-grid");
+	const emptyState = document.getElementById("empty-state");
+
+	function filterProducts(category: string) {
+		let visibleCount = 0;
+
+		products.forEach((product) => {
+			const productCategory = product.getAttribute("data-category");
+			if (category === "all" || productCategory === category) {
+				(product as HTMLElement).style.display = "";
+				visibleCount++;
+			} else {
+				(product as HTMLElement).style.display = "none";
+			}
+		});
+
+		// 更新商品数量显示
+		const productCount = document.getElementById("product-count");
+		if (productCount) {
+			if (category === "all") {
+				productCount.textContent = `共 ${products.length} 件商品`;
+			} else {
+				productCount.textContent = `共 ${visibleCount} 件商品`;
+			}
+		}
+
+		// 显示/隐藏空状态
+		if (visibleCount === 0) {
+			emptyState?.classList.remove("hidden");
+			productsGrid?.classList.add("hidden");
+		} else {
+			emptyState?.classList.add("hidden");
+			productsGrid?.classList.remove("hidden");
+		}
+
+		// 更新按钮状态
+		categoryFilters.forEach((btn) => {
+			const btnCategory = btn.getAttribute("data-category");
+			if (btnCategory === category) {
+				btn.classList.add("bg-[var(--primary)]", "text-white", "border-[var(--primary)]");
+				btn.classList.remove("bg-[var(--card-bg)]", "border-[var(--line-color)]");
+			} else {
+				btn.classList.remove("bg-[var(--primary)]", "text-white", "border-[var(--primary)]");
+				btn.classList.add("bg-[var(--card-bg)]", "border-[var(--line-color)]");
+			}
+		});
+	}
+
+	categoryFilters.forEach((btn) => {
+		btn.addEventListener("click", () => {
+			const category = btn.getAttribute("data-category");
+			if (category) {
+				filterProducts(category);
+			}
+		});
+	});
+</script>
+

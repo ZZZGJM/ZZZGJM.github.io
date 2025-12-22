@@ -16,6 +16,24 @@
 - [Svelte](https://svelte.dev/) - 组件框架
 - [Tailwind CSS](https://tailwindcss.com/) - 实用优先的CSS框架
 
+## 项目结构
+
+```
+src/
+├── components/          # 组件
+│   ├── ProductCard.astro      # 商品卡片
+│   ├── PaymentModal.svelte    # 支付弹窗
+│   └── ...
+├── constants/          # 常量
+│   └── products.ts     # 商品数据
+├── pages/             # 页面
+│   ├── index.astro           # 商城首页
+│   ├── product/[id].astro    # 商品详情页
+│   └── payment-success.astro  # 支付成功页
+└── types/              # 类型定义
+    └── product.ts      # 商品类型
+```
+
 ## 开发
 
 ```bash
@@ -35,15 +53,6 @@ pnpm preview
 ## 部署
 
 本项目已配置为 GitHub Pages，推送到 main 分支后会自动部署。
-
-## Timeline
-
-- 9.2 markdown中要添加local图片, 不需要在前面加入./ (比如./imgs/flow_matching_tutorial/1.png❌ imgs/flow_matching_tutorial/1.png ✔)
-- 9.1 添加鼠标点击文本特效, 引入随机表情(NachoNeko, cat girl, 胡桃等), 可以在"\src\components\mouse\click-content-config.ts"添加表情属性, 在"\src\components\mouse\ClickTextEffect.astro"作相应的修改
-- 8.31 增加背景"蜘蛛网", 在"\src\layouts\Layout.astro"的\<body>下添加<SpiderWebEffect/>
-- 8.30 修改部分布局, 增加友链链接以及增加Timeline,banner轮播图(修改config下的src从string->"Array<{ src: string}>"数组, 在"\src\layouts\MainGridLayout.astro"中将ImageWrapper换成Carousel)
-- 8.29 采用[fuwari](https://github.com/saicaca/fuwari)模板
-- 8.28 开始学习[Astro](https://docs.astro.build/zh-cn/getting-started/)
 
 
 

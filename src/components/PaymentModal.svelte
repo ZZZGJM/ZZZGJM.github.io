@@ -2,7 +2,7 @@
 	import { Icon } from "astro-icon/components";
 	import type { PaymentMethod, Product } from "../types/product";
 
-	export let product: Product;
+	const { product } = $props<{ product: Product }>();
 	let isOpen = $state(false);
 	let selectedPayment: PaymentMethod = $state("wechat");
 

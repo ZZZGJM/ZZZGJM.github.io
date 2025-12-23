@@ -1,4 +1,9 @@
-import type { NavBarConfig, ProfileConfig, SiteConfig } from "./types/config";
+import type {
+	ExpressiveCodeConfig,
+	NavBarConfig,
+	ProfileConfig,
+	SiteConfig,
+} from "./types/config";
 import { LinkPreset } from "./types/config";
 
 export const siteConfig: SiteConfig = {
@@ -39,4 +44,10 @@ export const profileConfig: ProfileConfig = {
 	name: "精选商城",
 	bio: "发现优质商品，享受便捷购物体验",
 	links: [],
+};
+
+export const expressiveCodeConfig: ExpressiveCodeConfig = {
+	// Note: Some styles (such as background color) are being overridden, see the astro.config.mjs file.
+	// Please select a dark theme, as this blog theme currently only supports dark background color
+	theme: "github-dark",
 };

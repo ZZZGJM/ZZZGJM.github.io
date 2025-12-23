@@ -43,7 +43,7 @@ if (!product || !orderId) {
 		</div>
 
 		<!-- 私密信息 -->
-		{#if product.secretContent}
+		{product.secretContent && (
 			<div class="mb-8 p-6 bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 rounded-lg border-2 border-[var(--primary)]/20 relative overflow-hidden">
 				<!-- 装饰性背景 -->
 				<div class="absolute top-0 right-0 w-32 h-32 bg-[var(--primary)]/5 rounded-full -mr-16 -mt-16"></div>
@@ -75,7 +75,7 @@ if (!product || !orderId) {
 					</div>
 				</div>
 			</div>
-		{/if}
+		)}
 
 		<!-- 操作按钮 -->
 		<div class="flex gap-4">

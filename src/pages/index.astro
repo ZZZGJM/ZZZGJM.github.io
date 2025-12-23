@@ -2,6 +2,7 @@
 import MainGridLayout from "../layouts/MainGridLayout.astro";
 import ProductCard from "../components/ProductCard.astro";
 import { products, getAllCategories } from "../constants/products";
+import { Icon } from "astro-icon/components";
 ---
 
 <MainGridLayout title="商城首页" description="精选优质商品，欢迎选购">
@@ -89,8 +90,6 @@ import { products, getAllCategories } from "../constants/products";
 </MainGridLayout>
 
 <script>
-	import { Icon } from "astro-icon/components";
-
 	// 商品分类筛选功能
 	const categoryFilters = document.querySelectorAll(".category-filter");
 	const products = document.querySelectorAll("[data-category]");
